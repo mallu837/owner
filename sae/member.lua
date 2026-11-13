@@ -89,7 +89,7 @@ end
 -- =====================================================================
 -- CONSTANTS
 -- =====================================================================
-local EGG_KEY        = "k109"
+local EGG_KEY        = "HOLLP"
 local EGG_SHARE_URL  = "https://my.tomroblox.com/egg"
 local GV_LEVELS      = {50e6, 100e6, 300e6, 500e6, 1e9, 5e9, 10e9}
 local GV_LABELS      = {"50M/s", "100M/s", "300M/s", "500M/s", "1B/s", "5B/s", "10B/s"}
