@@ -2,11 +2,11 @@
 -- JEN FINDER — Auto-Save Button Position, All-Pink, Instant Auto Join
 -- =====================================================================
 
-local Players      = game:GetService("Players")
+local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local HttpService  = game:GetService("HttpService")
-local LocalPlayer  = Players.LocalPlayer
-local CoreGui      = game:GetService("CoreGui")
+local HttpService = game:GetService("HttpService")
+local LocalPlayer = Players.LocalPlayer
+local CoreGui = game:GetService("CoreGui")
 
 local GENV = (getgenv and getgenv()) or _G
 GENV.__FinderGen = (GENV.__FinderGen or 0) + 1
@@ -19,42 +19,39 @@ local function alive() return GENV.__FinderGen == MY_GEN end
 local function getResetInfo()
     local now = workspace:GetServerTimeNow()
     local interval = 300 -- 5 minutes (300 seconds)
-
     local nextResetUnix = (math.floor(now / interval) + 1) * interval
     local remaining = nextResetUnix - now
-
     return {
-        resetAt   = nextResetUnix * 1000,
+        resetAt = nextResetUnix * 1000,
         remaining = remaining,
-        running   = true,
+        running = true,
     }
 end
 
 -- =====================================================================
 -- COLOR PALETTE (all pink)
 -- =====================================================================
-local PINK       = Color3.fromRGB(236, 72, 153)
-local PINK_LT    = Color3.fromRGB(255, 105, 180)
-local PINK_HOT   = Color3.fromRGB(255, 60, 150)
-local PINK_DK    = Color3.fromRGB(190, 24, 93)
-local PINK_MID   = Color3.fromRGB(210, 50, 130)
-local PINK_PALE  = Color3.fromRGB(255, 200, 225)
-local PANEL_BG   = Color3.fromRGB(34, 16, 26)
-local ROW_BG     = Color3.fromRGB(52, 24, 40)
-local CHIP_BG    = Color3.fromRGB(85, 40, 65)
-local INPUT_BG   = Color3.fromRGB(60, 26, 46)
-local JOIN_BG    = PINK
+local PINK = Color3.fromRGB(236, 72, 153)
+local PINK_LT = Color3.fromRGB(255, 105, 180)
+local PINK_HOT = Color3.fromRGB(255, 60, 150)
+local PINK_DK = Color3.fromRGB(190, 24, 93)
+local PINK_MID = Color3.fromRGB(210, 50, 130)
+local PINK_PALE = Color3.fromRGB(255, 200, 225)
+local PANEL_BG = Color3.fromRGB(34, 16, 26)
+local ROW_BG = Color3.fromRGB(52, 24, 40)
+local CHIP_BG = Color3.fromRGB(85, 40, 65)
+local INPUT_BG = Color3.fromRGB(60, 26, 46)
+local JOIN_BG = PINK
 local REFRESH_BG = PINK_DK
-local CLOSE_BG   = Color3.fromRGB(230, 50, 130)
-local AUTO_BG    = Color3.fromRGB(110, 30, 80)
-local HERE_BG    = Color3.fromRGB(80, 220, 140) -- Green for current server
+local CLOSE_BG = Color3.fromRGB(230, 50, 130)
+local AUTO_BG = Color3.fromRGB(110, 30, 80)
+local HERE_BG = Color3.fromRGB(80, 220, 140) -- Green for current server
 
 -- =====================================================================
 -- TOGGLE IMAGE (Jen.png)
 -- =====================================================================
 local TOGGLE_IMAGE_URL = "https://raw.githubusercontent.com/mallu837/sae/main/Jen.png"
 local TOGGLE_IMAGE_LOCAL = "JenFinderToggle.png"
-
 local toggleImage = nil
 pcall(function()
     if isfile and isfile(TOGGLE_IMAGE_LOCAL) then
@@ -65,15 +62,11 @@ pcall(function()
         end
     end
     if writefile then
-        local ok, res = pcall(function()
-            return game:HttpGet(TOGGLE_IMAGE_URL, true)
-        end)
+        local ok, res = pcall(function() return game:HttpGet(TOGGLE_IMAGE_URL, true) end)
         if ok and type(res) == "string" and #res > 200 then
             pcall(writefile, TOGGLE_IMAGE_LOCAL, res)
             local loader = getcustomasset or getsynasset
-            if loader then
-                toggleImage = loader(TOGGLE_IMAGE_LOCAL)
-            end
+            if loader then toggleImage = loader(TOGGLE_IMAGE_LOCAL) end
         end
     end
 end)
@@ -93,17 +86,16 @@ end
 -- =====================================================================
 -- CONSTANTS
 -- =====================================================================
-local EGG_KEY        = "k109"
-local EGG_SHARE_URL  = "https://my.tomroblox.com/egg"
-local GV_LEVELS      = {50e6, 100e6, 300e6, 500e6, 1e9, 5e9, 10e9}
-local GV_LABELS      = {"50M/s", "100M/s", "300M/s", "500M/s", "1B/s", "5B/s", "10B/s"}
-local GV_FILE        = "JenFinder_GV.txt"
-local GV_SORT_FILE   = "JenFinder_Sort.txt"
-local GV_AUTO_FILE   = "JenFinder_AutoJoin.txt"
+local EGG_KEY = "HOLLP"
+local EGG_SHARE_URL = "https://my.tomroblox.com/egg"
+local GV_LEVELS = {50e6, 100e6, 300e6, 500e6, 1e9, 5e9, 10e9}
+local GV_LABELS = {"50M/s", "100M/s", "300M/s", "500M/s", "1B/s", "5B/s", "10B/s"}
+local GV_FILE = "JenFinder_GV.txt"
+local GV_SORT_FILE = "JenFinder_Sort.txt"
+local GV_AUTO_FILE = "JenFinder_AutoJoin.txt"
 local GV_AUTOON_FILE = "JenFinder_AutoOn.txt"
-local GV_BTN_POS     = "JenFinder_BtnPos.txt"
-local GV_RAND_POWER  = 0.6
-
+local GV_BTN_POS = "JenFinder_BtnPos.txt"
+local GV_RAND_POWER = 0.6
 local currentLanguage = "EN"
 local GV_IDX = 5
 local GV_SORT = 1
@@ -186,7 +178,7 @@ end
 local function gvFmt(v)
     v = tonumber(v) or 0
     local units = {{1e33,"Dc"},{1e30,"No"},{1e27,"Oc"},{1e24,"Sp"},{1e21,"Sx"},{1e18,"Qi"},
-                   {1e15,"Qa"},{1e12,"T"},{1e9,"B"},{1e6,"M"},{1e3,"K"}}
+        {1e15,"Qa"},{1e12,"T"},{1e9,"B"},{1e6,"M"},{1e3,"K"}}
     for _, u in ipairs(units) do
         if v >= u[1] then
             local t = string.format("%.2f", v / u[1]):gsub("0+$", ""):gsub("%.$", "")
@@ -199,17 +191,13 @@ end
 local function gvFetch(url, key)
     GENV.__ChilliGVErr = nil
     local raw, status, got = nil, nil, false
-    local req = (syn and syn.request) or (http and http.request) or http_request or request
-        or (fluxus and fluxus.request)
+    local req = (syn and syn.request) or (http and http.request) or http_request or request or (fluxus and fluxus.request)
     if key and req then
-        local ok2, r2 = pcall(req, {Url = url, Method = "GET",
-            Headers = {["Accept"] = "application/json", ["X-K"] = key}})
+        local ok2, r2 = pcall(req, {Url = url, Method = "GET", Headers = {["Accept"] = "application/json", ["X-K"] = key}})
         if ok2 and type(r2) == "table" then
             got = true
             status = tonumber(r2.StatusCode)
-            if type(r2.Body) == "string" and #r2.Body > 10 and (not status or status < 400) then
-                raw = r2.Body
-            end
+            if type(r2.Body) == "string" and #r2.Body > 10 and (not status or status < 400) then raw = r2.Body end
         end
     end
     if not raw then
@@ -249,9 +237,7 @@ local function gvLoad()
         if d then
             if u.own then
                 for _, e in ipairs(d) do
-                    if type(e) == "table" and tonumber(e.ageMs) then
-                        e.timestamp = nowL - tonumber(e.ageMs)
-                    end
+                    if type(e) == "table" and tonumber(e.ageMs) then e.timestamp = nowL - tonumber(e.ageMs) end
                 end
             end
             srcs[#srcs+1] = d
@@ -264,7 +250,8 @@ local function gvLoad()
         if type(e) ~= "table" or type(e.jobId) ~= "string" then return end
         local cur = byJob[e.jobId]
         if not cur then
-            local c = {}; for k, v in pairs(e) do c[k] = v end
+            local c = {}
+            for k, v in pairs(e) do c[k] = v end
             byJob[e.jobId] = c; out[#out+1] = c
         else
             if type(e.value) == "number" and (type(cur.value) ~= "number" or e.value > cur.value) then
@@ -276,19 +263,19 @@ local function gvLoad()
             end
         end
     end
-    for _, d in ipairs(srcs) do for _, e in ipairs(d) do add(e) end end
+    for _, d in ipairs(srcs) do
+        for _, e in ipairs(d) do add(e) end
+    end
     return out
 end
 
 local function gvFilter(list, minV, useTried, includeCurrent)
     local best = {}
     for _, e in ipairs(list) do
-        if type(e) == "table" and type(e.jobId) == "string" and type(e.value) == "number"
-            and e.value >= minV and (includeCurrent or e.jobId ~= game.JobId)
-            and not (useTried and GV_TRIED[e.jobId]) then
+        if type(e) == "table" and type(e.jobId) == "string" and type(e.value) == "number" and e.value >= minV
+            and (includeCurrent or e.jobId ~= game.JobId) and not (useTried and GV_TRIED[e.jobId]) then
             local pl, mx = tonumber(e.players), tonumber(e.maxPlayers)
             local full = pl and mx and mx > 0 and pl >= mx
-
             -- Current server is allowed even if it says it's full
             if not full or e.jobId == game.JobId then
                 local cur = best[e.jobId]
@@ -296,7 +283,8 @@ local function gvFilter(list, minV, useTried, includeCurrent)
                     best[e.jobId] = {
                         jobId = e.jobId, value = e.value,
                         pet = (tostring(e.petName or "Rare Pet"):gsub("%s+"," ")),
-                        players = pl, maxPlayers = mx, ts = tonumber(e.timestamp),
+                        players = pl, maxPlayers = mx,
+                        ts = tonumber(e.timestamp),
                         icon = tostring(e.iconId or ""),
                         rarity = tostring(e.rarityName or "")
                     }
@@ -339,11 +327,9 @@ local function hopHighValue(minV, only, cachedCands)
     if GENV.__ChilliHopBusy and os.clock() - (GENV.__ChilliHopAt or 0) < 60 then return end
     GENV.__ChilliHopBusy = true
     GENV.__ChilliHopAt = os.clock()
-
     task.spawn(function()
         local TeleportSvc = game:GetService("TeleportService")
-        local placeId     = game.PlaceId
-
+        local placeId = game.PlaceId
         local list, cand
         if cachedCands and #cachedCands > 0 then
             list, cand = true, cachedCands
@@ -357,13 +343,11 @@ local function hopHighValue(minV, only, cachedCands)
             table.clear(GV_TRIED)
             cand = gvFilter(list, minV, false)
         end
-
         if list and #cand > 0 then
             for i = 1, math.min(#cand, 8) do
                 if not alive() then break end
                 local sv = cand[i]
                 GV_TRIED[sv.jobId] = true
-
                 local failed, conn, why = false, nil, "fail"
                 pcall(function()
                     conn = TeleportSvc.TeleportInitFailed:Connect(function(plr, result)
@@ -374,27 +358,20 @@ local function hopHighValue(minV, only, cachedCands)
                         end
                     end)
                 end)
-
                 local ok = pcall(function()
                     TeleportSvc:TeleportToPlaceInstance(placeId, sv.jobId, LocalPlayer)
                 end)
-
                 if not ok then
                     failed = true
                 else
                     local t0 = os.clock()
-                    while os.clock() - t0 < 2.5 and not failed do
-                        task.wait(0.12)
-                    end
+                    while os.clock() - t0 < 2.5 and not failed do task.wait(0.12) end
                 end
-
                 if conn then pcall(function() conn:Disconnect() end) end
                 if not failed then break end
-
                 task.wait(why == "flood" and 3.5 or 0.3)
             end
         end
-
         GENV.__ChilliHopBusy = false
     end)
 end
@@ -420,18 +397,16 @@ local function createGVBar()
 
     local function saveAutoState()
         pcall(function()
-            if writefile then
-                writefile(GV_AUTOON_FILE, AUTO_JOIN_ON and "1" or "0")
-            end
+            if writefile then writefile(GV_AUTOON_FILE, AUTO_JOIN_ON and "1" or "0") end
         end)
         AUTO_JOIN_ON_SAVED = AUTO_JOIN_ON
     end
 
     local function tierColor(v)
         if v >= 1e10 then return Color3.fromRGB(255, 96, 80) end
-        if v >= 5e9  then return Color3.fromRGB(255, 200, 70) end
-        if v >= 1e9  then return Color3.fromRGB(200, 120, 255) end
-        if v >= 1e8  then return Color3.fromRGB(80, 220, 140) end
+        if v >= 5e9 then return Color3.fromRGB(255, 200, 70) end
+        if v >= 1e9 then return Color3.fromRGB(200, 120, 255) end
+        if v >= 1e8 then return Color3.fromRGB(80, 220, 140) end
         return Color3.fromRGB(120, 170, 230)
     end
 
@@ -457,9 +432,7 @@ local function createGVBar()
         end
     end
 
-    local function closeList()
-        if lsg then lsg.Enabled = false end
-    end
+    local function closeList() if lsg then lsg.Enabled = false end end
 
     local function clearRows()
         for _, c in ipairs(lrows:GetChildren()) do
@@ -484,35 +457,29 @@ local function createGVBar()
             refreshChips()
             return
         end
-
         -- Include current server in the items
         local items = gvFilter(list, minV, false, true)
         local seen, rars = {}, {}
         for _, it in ipairs(items) do
-            if it.rarity ~= "" and not seen[it.rarity] then
-                seen[it.rarity] = true; rars[#rars+1] = it.rarity
-            end
+            if it.rarity ~= "" and not seen[it.rarity] then seen[it.rarity] = true; rars[#rars+1] = it.rarity end
         end
         table.sort(rars)
         if GV_RARITY and not seen[GV_RARITY] then GV_RARITY = nil end
         refreshChips()
-
         local currentServer = nil
         local otherItems = {}
-
         for _, it in ipairs(items) do
             if it.jobId == game.JobId then
                 currentServer = it
             else
-                if not GV_RARITY or it.rarity == GV_RARITY then
-                    table.insert(otherItems, it)
-                end
+                if not GV_RARITY or it.rarity == GV_RARITY then table.insert(otherItems, it) end
             end
         end
-
         -- Sort other servers
-        if GV_SORT == 1 then otherItems = gvShuffle(otherItems)
-        elseif GV_SORT == 3 then table.sort(otherItems, function(a,b) return (a.ts or 0) > (b.ts or 0) end)
+        if GV_SORT == 1 then
+            otherItems = gvShuffle(otherItems)
+        elseif GV_SORT == 3 then
+            table.sort(otherItems, function(a,b) return (a.ts or 0) > (b.ts or 0) end)
         elseif GV_SORT == 4 then
             table.sort(otherItems, function(a,b)
                 local pa, pb = a.players or 99, b.players or 99
@@ -520,7 +487,6 @@ local function createGVBar()
                 return a.value > b.value
             end)
         end
-
         -- Force current server to the top of the list
         local shown = {}
         if currentServer then table.insert(shown, currentServer) end
@@ -528,12 +494,10 @@ local function createGVBar()
 
         ltitle.Text = "High eggs: " .. #shown
         local nowMs = os.time() * 1000
-
         for i = 1, math.min(#shown, 50) do
             local it = shown[i]
             local isHere = (it.jobId == game.JobId)
             local col = tierColor(it.value)
-
             local row = Instance.new("Frame")
             row.LayoutOrder = i
             row.Size = UDim2.new(1,-6,0,46)
@@ -545,7 +509,6 @@ local function createGVBar()
             rs.Color = isHere and HERE_BG or PINK_LT
             rs.Transparency = isHere and 0 or 0.35
             rs.Parent = row
-
             local bar2 = Instance.new("Frame")
             bar2.Size = UDim2.new(0,3,0.6,0)
             bar2.Position = UDim2.new(0,3,0.2,0)
@@ -553,7 +516,6 @@ local function createGVBar()
             bar2.BorderSizePixel = 0
             local bc = Instance.new("UICorner"); bc.CornerRadius = UDim.new(1,0); bc.Parent = bar2
             bar2.Parent = row
-
             local img = Instance.new("ImageLabel")
             img.Position = UDim2.new(0,10,0.5,-17)
             img.Size = UDim2.fromOffset(34,34)
@@ -563,7 +525,6 @@ local function createGVBar()
             if it.icon ~= "" then img.Image = "rbxassetid://" .. it.icon end
             local ic = Instance.new("UICorner"); ic.CornerRadius = UDim.new(0,8); ic.Parent = img
             img.Parent = row
-
             local nm = Instance.new("TextLabel")
             nm.BackgroundTransparency = 1
             nm.Position = UDim2.new(0,50,0,3)
@@ -575,7 +536,6 @@ local function createGVBar()
             nm.TextColor3 = Color3.new(1,1,1)
             nm.Text = it.pet
             nm.Parent = row
-
             local vl = Instance.new("TextLabel")
             vl.BackgroundTransparency = 1
             vl.Position = UDim2.new(0,50,0,20)
@@ -586,7 +546,6 @@ local function createGVBar()
             vl.TextColor3 = col
             vl.Text = gvFmt(it.value) .. (it.rarity ~= "" and (" • " .. it.rarity) or "")
             vl.Parent = row
-
             local ageTxt, stale = "", false
             if it.ts and it.ts > 1e11 then
                 local ageSecs = math.max(0, (nowMs - it.ts) / 1000)
@@ -594,10 +553,7 @@ local function createGVBar()
                 ageTxt = tostring(math.floor((300 - remaining) / 60)) .. 'm ago'
                 stale = ageSecs >= 60
             end
-
-            local pc = (it.players and it.maxPlayers)
-                and (it.players .. "/" .. it.maxPlayers .. " players")
-                or "players unknown"
+            local pc = (it.players and it.maxPlayers) and (it.players .. "/" .. it.maxPlayers .. " players") or "players unknown"
             local sb = Instance.new("TextLabel")
             sb.BackgroundTransparency = 1
             sb.Position = UDim2.new(0,50,0,32)
@@ -608,7 +564,6 @@ local function createGVBar()
             sb.TextColor3 = stale and Color3.fromRGB(255,170,90) or PINK_PALE
             sb.Text = pc .. ((pc ~= "" and ageTxt ~= "") and " • " or "") .. ageTxt
             sb.Parent = row
-
             local jb = Instance.new("TextButton")
             jb.AnchorPoint = Vector2.new(1,0.5)
             jb.Position = UDim2.new(1,-6,0.5,0)
@@ -619,7 +574,6 @@ local function createGVBar()
             jb.TextSize = 13
             jb.TextColor3 = Color3.new(1,1,1)
             jb.TextStrokeTransparency = 0.55
-
             if isHere then
                 jb.Text = "HERE"
                 jb.BackgroundColor3 = HERE_BG
@@ -633,10 +587,8 @@ local function createGVBar()
                     hopHighValue(minV, it)
                 end)
             end
-
             local jc = Instance.new("UICorner"); jc.CornerRadius = UDim.new(0,8); jc.Parent = jb
             jb.Parent = row
-
             row.Parent = lrows
         end
     end
@@ -680,18 +632,14 @@ local function createGVBar()
                         break
                     end
                 end
-
                 if not AUTO_JOIN_ON then break end
-
                 list = gvLoad()
                 if list then
                     CACHE.list = list
                     CACHE.at = os.clock()
                     render()
                 end
-
                 if not AUTO_JOIN_ON then break end
-
                 if list then
                     cand = gvFilter(list, AUTO_JOIN_V, true)
                     if #cand == 0 and next(GV_TRIED) and os.clock() - lastAutoClearAt > 30 then
@@ -718,7 +666,6 @@ local function createGVBar()
                         lstatus.Visible = true
                     end
                 end
-
                 task.wait(1)
             end
             autoLoopActive = false
@@ -809,10 +756,7 @@ local function createGVBar()
                 if info and info.running and type(info.remaining) == 'number' then
                     local s = math.max(0, math.ceil(info.remaining))
                     resetLbl.Text = string.format('RESET %02d:%02d', math.floor(s/60), s%60)
-                    resetLbl.TextColor3 = (s <= 30  and Color3.fromRGB(255, 85, 85))
-                                         or (s <= 60 and Color3.fromRGB(255, 215, 65))
-                                         or  Color3.fromRGB(230, 245, 255)
-
+                    resetLbl.TextColor3 = (s <= 30 and Color3.fromRGB(255, 85, 85)) or (s <= 60 and Color3.fromRGB(255, 215, 65)) or Color3.fromRGB(230, 245, 255)
                     if s <= 0 or (lastSec > 0 and s > lastSec + 60) then
                         LAST_RESET_AT = os.time()
                         clearRows()
@@ -891,9 +835,7 @@ local function createGVBar()
             local items = gvFilter(list, GV_LEVELS[GV_IDX], false, true)
             local seen, rars = {}, {}
             for _, it in ipairs(items) do
-                if it.rarity ~= "" and not seen[it.rarity] then
-                    seen[it.rarity] = true; rars[#rars+1] = it.rarity
-                end
+                if it.rarity ~= "" and not seen[it.rarity] then seen[it.rarity] = true; rars[#rars+1] = it.rarity end
             end
             table.sort(rars)
             local nxt = nil
@@ -930,11 +872,8 @@ local function createGVBar()
 
         autoInput:GetPropertyChangedSignal("Text"):Connect(function()
             local v = parseSInput(autoInput.Text)
-            if v then
-                bAuto.Text = "Join " .. formatSInput(v)
-            else
-                bAuto.Text = "Auto Join"
-            end
+            if v then bAuto.Text = "Join " .. formatSInput(v)
+            else bAuto.Text = "Auto Join" end
         end)
 
         bAuto.Activated:Connect(function()
@@ -945,20 +884,14 @@ local function createGVBar()
             if not v then
                 autoInput.BackgroundColor3 = Color3.fromRGB(180, 40, 60)
                 task.delay(1, function()
-                    if autoInput and autoInput.Parent then
-                        autoInput.BackgroundColor3 = INPUT_BG
-                    end
+                    if autoInput and autoInput.Parent then autoInput.BackgroundColor3 = INPUT_BG end
                 end)
                 return
             end
-
             AUTO_JOIN_V = v
             autoInput.Text = formatSInput(v)
             bAuto.Text = "Join " .. formatSInput(v)
-            pcall(function()
-                if writefile then writefile(GV_AUTO_FILE, string.format("%.0f", v)) end
-            end)
-
+            pcall(function() if writefile then writefile(GV_AUTO_FILE, string.format("%.0f", v)) end end)
             local cached
             if CACHE.list then
                 cached = gvFilter(CACHE.list, v, false)
@@ -977,7 +910,6 @@ local function createGVBar()
                     return
                 end
             end
-
             closeList()
             hopHighValue(v, nil, cached)
         end)
@@ -989,6 +921,7 @@ local function createGVBar()
         bRef = btn("Refresh", REFRESH_BG, 11)
         bRef.Position = UDim2.new(0.65, 2, 0, 134)
         bRef.Size = UDim2.new(0.35, -10, 0, 24)
+
         bRef.Activated:Connect(function()
             loadList(not (CACHE.list and os.clock() - (CACHE.at or 0) < 2))
         end)
@@ -998,18 +931,12 @@ local function createGVBar()
             local v = parseSInput(autoInput.Text or "") or AUTO_JOIN_V
             AUTO_JOIN_V = v
             autoInput.Text = formatSInput(v)
-            pcall(function()
-                if writefile then writefile(GV_AUTO_FILE, string.format("%.0f", v)) end
-            end)
-
+            pcall(function() if writefile then writefile(GV_AUTO_FILE, string.format("%.0f", v)) end end)
             AUTO_JOIN_ON = not AUTO_JOIN_ON
             saveAutoState()
             updateAutoBtn()
             updateStatusLine()
-
-            if AUTO_JOIN_ON then
-                startAutoLoop()
-            end
+            if AUTO_JOIN_ON then startAutoLoop() end
         end)
 
         lrows = Instance.new("ScrollingFrame")
@@ -1035,22 +962,15 @@ local function createGVBar()
         AUTO_JOIN_ON = AUTO_JOIN_ON_SAVED
         updateAutoBtn()
         updateStatusLine()
-
         local target = 1
-        pcall(function()
-            target = math.clamp(workspace.CurrentCamera.ViewportSize.Y / 480, 0.8, 1.7)
-        end)
+        pcall(function() target = math.clamp(workspace.CurrentCamera.ViewportSize.Y / 480, 0.8, 1.7) end)
         lscale.Scale = target * 0.9
         lsg.Enabled = true
         pcall(function()
             TweenService:Create(lscale, TweenInfo.new(0.14, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Scale = target}):Play()
         end)
         loadList(false)
-
-        if AUTO_JOIN_ON then
-            startAutoLoop()
-        end
-
+        if AUTO_JOIN_ON then startAutoLoop() end
         if not PANEL_AUTO then
             PANEL_AUTO = true
             local lastSig, skips = nil, 0
@@ -1070,9 +990,7 @@ local function createGVBar()
                                 local parts = {}
                                 for i = 1, math.min(#list, 60) do
                                     local e = list[i]
-                                    if type(e) == "table" then
-                                        parts[#parts+1] = tostring(e.jobId) .. ":" .. tostring(e.value)
-                                    end
+                                    if type(e) == "table" then parts[#parts+1] = tostring(e.jobId) .. ":" .. tostring(e.value) end
                                 end
                                 local sig = #list .. "|" .. table.concat(parts, ",")
                                 skips = skips + 1
@@ -1081,7 +999,9 @@ local function createGVBar()
                                     local cp = lrows and lrows.CanvasPosition
                                     render()
                                     if cp then
-                                        task.defer(function() pcall(function() lrows.CanvasPosition = cp end) end)
+                                        task.defer(function()
+                                            pcall(function() lrows.CanvasPosition = cp end)
+                                        end)
                                     end
                                 end
                             end
@@ -1148,7 +1068,6 @@ local function createFloatingButton(panel)
         btn.TextStrokeTransparency = 0.5
         btn.Text = "Jen Finder"
         btn.Parent = sg
-
         local uc = Instance.new("UICorner"); uc.CornerRadius = UDim.new(0, 8); uc.Parent = btn
         local us = Instance.new("UIStroke"); us.Color = PINK_DK; us.Thickness = 1.5; us.Parent = btn
         local grad = Instance.new("UIGradient")
@@ -1158,7 +1077,6 @@ local function createFloatingButton(panel)
         })
         grad.Rotation = 90; grad.Parent = btn
     end
-
     btn.AnchorPoint = Vector2.new(0, 0.5)
 
     local savedX, savedY = 6, 200
@@ -1180,10 +1098,8 @@ local function createFloatingButton(panel)
     end)
 
     local dragging, dragStart, startPos = false, nil, nil
-
     btn.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1
-        or input.UserInputType == Enum.UserInputType.Touch then
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
             dragging = true
             dragStart = input.Position
             startPos = btn.Position
@@ -1203,11 +1119,9 @@ local function createFloatingButton(panel)
     end)
 
     btn.InputChanged:Connect(function(input)
-        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement
-        or input.UserInputType == Enum.UserInputType.Touch) then
+        if dragging and (input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch) then
             local delta = input.Position - dragStart
-            btn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X,
-                                     startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            btn.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
 
@@ -1227,6 +1141,4 @@ if AUTO_JOIN_ON_SAVED then
     end)
 end
 
-print("[🌸 Jen Finder] Loaded — Auto-Save Pos: ON · Toggle: " ..
-      (toggleImage and "Jen.png" or "Text") ..
-      " · Auto Join Saved: " .. (AUTO_JOIN_ON_SAVED and "ON" or "OFF"))
+print("[🌸 Jen Finder] Loaded — Auto-Save Pos: ON · Toggle: " .. (toggleImage and "Jen.png" or "Text") .. " · Auto Join Saved: " .. (AUTO_JOIN_ON_SAVED and "ON" or "OFF"))
